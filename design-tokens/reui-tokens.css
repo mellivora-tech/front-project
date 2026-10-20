@@ -1,0 +1,62 @@
+/**
+ * ReUI 命名令牌层 — 别名到桌面语义令牌(design-project dist/tokens.css)
+ *
+ * 本文件只定义 :root 别名,把 shadcn/ReUI 语义变量转发到桌面语义变量;
+ * Tailwind 的 @theme inline 注册在 src/index.css 中统一维护。
+ * 暗色/高对比:html 挂 data-theme="dark" | "contrast",底层变量自动换指向,本层无需重复定义。
+ */
+
+:root {
+  /* 表面 / 文本 */
+  --background: var(--color-bg-app);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-bg-surface);
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-bg-elevated);
+  --popover-foreground: var(--color-text-primary);
+
+  /* 操作 */
+  --primary: var(--color-action-primary-default);
+  --primary-foreground: var(--color-action-primary-text);
+  --secondary: var(--color-action-secondary-default);
+  --secondary-foreground: var(--color-action-secondary-text);
+  --muted: var(--color-bg-sunken);
+  --muted-foreground: var(--color-text-secondary);
+  --accent: var(--color-action-ghost-hover);
+  --accent-foreground: var(--color-text-primary);
+  --destructive: var(--color-action-danger-default);
+  --destructive-foreground: var(--color-action-danger-text);
+
+  /* 边框 / 输入 / 焦点 */
+  --border: var(--color-border-default);
+  --input: var(--color-border-default);
+  --ring: var(--color-border-focus);
+
+  /* ReUI 扩展:状态色成对映射到桌面 state 语义(浅底深字,对比度已校验) */
+  --info: var(--color-state-info-bg);
+  --info-foreground: var(--color-state-info-text);
+  --success: var(--color-state-success-bg);
+  --success-foreground: var(--color-state-success-text);
+  --warning: var(--color-state-warning-bg);
+  --warning-foreground: var(--color-state-warning-text);
+  --invert: var(--color-bg-inverse);
+  --invert-foreground: var(--color-text-inverse);
+
+  /* 图表 / 侧栏(shadcn 约定名) */
+  --chart-1: var(--color-viz-series-1);
+  --chart-2: var(--color-viz-series-2);
+  --chart-3: var(--color-viz-series-3);
+  --chart-4: var(--color-viz-series-4);
+  --chart-5: var(--color-viz-series-5);
+  --sidebar: var(--color-bg-surface);
+  --sidebar-foreground: var(--color-text-primary);
+  --sidebar-accent: var(--color-bg-sunken);
+  --sidebar-accent-foreground: var(--color-text-primary);
+  --sidebar-border: var(--color-border-subtle);
+  --sidebar-primary: var(--color-action-primary-default);
+  --sidebar-primary-foreground: var(--color-action-primary-text);
+  --sidebar-ring: var(--color-border-focus);
+
+  /* 圆角基准:桌面 radius.md */
+  --radius: var(--radius-md);
+}

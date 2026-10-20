@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三栏 Demo — ReUI 命名 × 桌面 Design Token</title>
+<!-- 1. 桌面令牌产物(色值唯一来源) 2. ReUI 命名别名层 -->
+<link rel="stylesheet" href="../../design-project/dist/tokens.css">
+<link rel="stylesheet" href="../design-tokens/reui-tokens.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, "SF Pro Text", "PingFang SC", "Segoe UI", sans-serif;
+    font-size: 13px;
+    background: var(--background);          /* ReUI 命名 ← 桌面语义 */
+    color: var(--foreground);
+    display: grid;
+    grid-template-columns: 232px 1fr 264px; /* 三栏 */
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── 左栏:侧栏导航 ── */
+  .sidebar {
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    padding: var(--space-16, 16px) var(--space-12, 12px);
+    display: flex; flex-direction: column; gap: var(--space-16, 16px);
+  }
+  .logo { font-weight: 700; font-size: 14px; padding: 0 var(--space-8, 8px); }
+  .nav { display: flex; flex-direction: column; gap: 2px; }
+  .nav-item {
+    display: flex; align-items: center; gap: var(--space-8, 8px);
+    padding: 6px var(--space-8, 8px); border-radius: var(--radius-sm, 4px);
+    color: var(--muted-foreground); cursor: pointer; user-select: none;
+  }
+  .nav-item:hover { background: var(--accent); color: var(--accent-foreground); }
+  .nav-item.active { background: var(--accent); color: var(--foreground); font-weight: 600; }
+  .nav-item .dot { width: 6px; height: 6px; border-radius: var(--radius-full, 9999px); background: currentColor; opacity: .6; }
+  .collab { margin-top: auto; border-top: 1px solid var(--border); padding-top: var(--space-12, 12px); }
+  .collab-title { font-size: 11px; color: var(--muted-foreground); margin-bottom: var(--space-8, 8px); padding: 0 var(--space-8, 8px); }
+  .avatars { display: flex; padding: 0 var(--space-8, 8px); }
+  .avatar {
+    width: 24px; height: 24px; border-radius: var(--radius-full, 9999px);
+    border: 2px solid var(--card); margin-left: -6px;
+    display: grid; place-items: center; font-size: 10px; font-weight: 700; color: #fff;
+  }
+  .avatar:first-child { margin-left: 0; }
+
+  /* ── 中栏:内容区 ── */
+  .main { display: flex; flex-direction: column; min-width: 0; }
+  .toolbar {
+    display: flex; align-items: center; gap: var(--space-8, 8px);
+    padding: var(--space-12, 12px) var(--space-16, 16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .toolbar .title { font-weight: 600; font-size: 14px; margin-right: auto; }
+  .btn {
+    padding: 5px var(--space-12, 12px); border-radius: var(--radius-sm, 4px);
+    font-size: 13px; cursor: pointer; border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--primary); color: var(--primary-foreground); }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-secondary {
+    background: var(--secondary); color: var(--secondary-foreground);
+    border-color: var(--border);
+  }
+  .btn-secondary:hover { background: var(--muted); }
+  .btn-ghost { background: transparent; color: var(--muted-foreground); }
+  .btn-ghost:hover { background: var(--accent); color: var(--foreground); }
+
+  .content { padding: var(--space-16, 16px); overflow: auto; display: grid; gap: var(--space-16, 16px); align-content: start; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-12, 12px); }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius-md, 6px); padding: var(--space-16, 16px);
+    box-shadow: var(--shadow-1);
+  }
+  .card .label { color: var(--muted-foreground); font-size: 12px; margin-bottom: var(--space-4, 4px); }
+  .card .value { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .card .delta { font-size: 12px; margin-top: var(--space-4, 4px); }
+  .delta.up   { color: var(--color-state-success-text); }
+  .delta.down { color: var(--color-state-error-text); }
+
+  .panel {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius-md, 6px); box-shadow: var(--shadow-1); overflow: hidden;
+  }
+  .panel-head { padding: var(--space-12, 12px) var(--space-16, 16px); border-bottom: 1px solid var(--border); font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px var(--space-16, 16px); border-bottom: 1px solid var(--border); }
+  th { color: var(--muted-foreground); font-weight: 500; font-size: 12px; background: var(--muted); }
+  tr:last-child td { border-bottom: none; }
+
+  /* ReUI 扩展状态令牌 → Alert / Badge */
+  .badge { display: inline-block; padding: 1px 8px; border-radius: var(--radius-full, 9999px); font-size: 12px; }
+  .badge-info    { background: var(--info);    color: var(--info-foreground); }
+  .badge-success { background: var(--success); color: var(--success-foreground); }
+  .badge-warning { background: var(--warning); color: var(--warning-foreground); }
+  .badge-destructive { background: var(--destructive); color: var(--destructive-foreground); }
+
+  /* ── 右栏:属性检查器 ── */
+  .inspector {
+    background: var(--card); border-left: 1px solid var(--border);
+    padding: var(--space-16, 16px); overflow: auto; display: flex; flex-direction: column; gap: var(--space-16, 16px);
+  }
+  .insp-title { font-weight: 600; font-size: 14px; }
+  .field { display: flex; flex-direction: column; gap: var(--space-4, 4px); }
+  .field label { font-size: 12px; color: var(--muted-foreground); }
+  .field input, .field select {
+    background: var(--muted); color: var(--foreground);
+    border: 1px solid var(--input); border-radius: var(--radius-sm, 4px);
+    padding: 6px var(--space-8, 8px); font-size: 13px; outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--ring); box-shadow: 0 0 0 2px color-mix(in srgb, var(--ring) 30%, transparent); }
+  .alert { border-radius: var(--radius-sm, 4px); padding: var(--space-8, 8px) var(--space-12, 12px); font-size: 12px; border: 1px solid transparent; }
+  .alert-info { background: var(--info); color: var(--info-foreground); border-color: var(--color-state-info-border); }
+  .alert-warning { background: var(--warning); color: var(--warning-foreground); border-color: var(--color-state-warning-border); }
+  .invert-chip {
+    background: var(--invert); color: var(--invert-foreground);
+    border-radius: var(--radius-sm, 4px); padding: var(--space-8, 8px) var(--space-12, 12px);
+    font-size: 12px; display: flex; justify-content: space-between;
+  }
+  .theme-toggle { position: fixed; top: 12px; left: 244px; z-index: 10; }
+</style>
+</head>
+<body>
+
+  <!-- 左栏 -->
+  <aside class="sidebar">
+    <div class="logo">⚡ Acme Studio</div>
+    <nav class="nav">
+      <div class="nav-item active"><span class="dot"></span>仪表盘</div>
+      <div class="nav-item"><span class="dot"></span>项目</div>
+      <div class="nav-item"><span class="dot"></span>数据网格</div>
+      <div class="nav-item"><span class="dot"></span>日历</div>
+      <div class="nav-item"><span class="dot"></span>看板</div>
+      <div class="nav-item"><span class="dot"></span>设置</div>
+    </nav>
+    <div class="collab">
+      <div class="collab-title">在线协作</div>
+      <div class="avatars">
+        <div class="avatar" style="background:#f59e0b">李</div>
+        <div class="avatar" style="background:#10b981">王</div>
+        <div class="avatar" style="background:#8b5cf6">陈</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 中栏 -->
+  <main class="main">
+    <div class="toolbar">
+      <span class="title">项目总览</span>
+      <button class="btn btn-ghost" onclick="toggleTheme()" id="themeBtn">🌙 暗色</button>
+      <button class="btn btn-secondary">导出</button>
+      <button class="btn btn-primary">新建项目</button>
+    </div>
+    <div class="content">
+      <div class="cards">
+        <div class="card">
+          <div class="label">总访问量</div>
+          <div class="value">128,430</div>
+          <div class="delta up">▲ 12.5% 较上周</div>
+        </div>
+        <div class="card">
+          <div class="label">活跃项目</div>
+          <div class="value">36</div>
+          <div class="delta up">▲ 4 个新增</div>
+        </div>
+        <div class="card">
+          <div class="label">错误率</div>
+          <div class="value">0.32%</div>
+          <div class="delta down">▼ 0.08% 改善</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">部署记录</div>
+        <table>
+          <thead><tr><th>项目</th><th>状态</th><th>负责人</th><th>时间</th></tr></thead>
+          <tbody>
+            <tr><td>web-console</td><td><span class="badge badge-success">已上线</span></td><td>李雷</td><td>10 分钟前</td></tr>
+            <tr><td>data-pipeline</td><td><span class="badge badge-info">构建中</span></td><td>韩梅梅</td><td>1 小时前</td></tr>
+            <tr><td>mobile-sdk</td><td><span class="badge badge-warning">待审核</span></td><td>陈晨</td><td>昨天 18:20</td></tr>
+            <tr><td>legacy-admin</td><td><span class="badge badge-destructive">失败</span></td><td>王强</td><td>昨天 09:41</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- 右栏 -->
+  <aside class="inspector">
+    <div class="insp-title">属性检查器</div>
+    <div class="field"><label>项目名称</label><input value="web-console"></div>
+    <div class="field"><label>环境</label><select><option>生产</option><option>预发</option><option>测试</option></select></div>
+    <div class="alert alert-info">💡 构建队列正常,预计 2 分钟内完成。</div>
+    <div class="alert alert-warning">⚠️ legacy-admin 已连续失败 3 次,建议回滚。</div>
+    <div class="invert-chip"><span>快捷键</span><span>⌘ K</span></div>
+    <div class="invert-chip"><span>主题模式</span><span id="modeLabel">Light</span></div>
+  </aside>
+
+<script>
+  function toggleTheme() {
+    const dark = document.documentElement.dataset.theme === 'dark';
+    if (dark) delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = 'dark';
+    document.getElementById('themeBtn').textContent = dark ? '🌙 暗色' : '☀️ 亮色';
+    document.getElementById('modeLabel').textContent = dark ? 'Light' : 'Dark';
+  }
+</script>
+</body>
+</html>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import LegacyDemo from './LegacyDemo.jsx'
 import MeshHome from './mesh/MeshHome.jsx'
 import MeshTemplates from './mesh/MeshTemplates.jsx'
 import MeshShell from './mesh/MeshShell.jsx'
@@ -12,16 +11,6 @@ export default function App() {
     window.addEventListener('hashchange', on)
     return () => window.removeEventListener('hashchange', on)
   }, [])
-  if (route === '#legacy') {
-    return (
-      <>
-        <RouteProgress />
-        <div key={route} className="animate-in fade-in slide-in-from-bottom-1 duration-200">
-          <LegacyDemo />
-        </div>
-      </>
-    )
-  }
   const isTemplates = route === '#templates'
   return (
     <>

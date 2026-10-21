@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import {
-  X, UserRound, Building2, Users, CreditCard, SlidersHorizontal, Upload,
-} from 'lucide-react'
+import { UserRound, Building2, Users, CreditCard, SlidersHorizontal, Upload } from 'lucide-react'
 import { useProfile, saveProfile, DEFAULT_PROFILE } from './profile.js'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 
 const NAV = [
@@ -41,12 +43,6 @@ export default function ProfileDialog({ onClose, initialPage = 'profile' }) {
   const [saved, setSaved] = useState(false)
   const fileRef = useRef(null)
 
-  useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
-
   const set = (patch) => setForm((f) => ({ ...f, ...patch }))
 
   const upload = (file) => {
@@ -68,44 +64,42 @@ export default function ProfileDialog({ onClose, initialPage = 'profile' }) {
   const stub = STUBS[page]
 
   return (
-    <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/[0.18] backdrop-blur-[2px]"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="grid h-[640px] w-[920px] max-w-[94vw] grid-cols-[200px_1fr] overflow-hidden rounded-xl border border-black/[0.08] bg-white shadow-2xl">
-        {/* 左导航 */}
-        <aside className="space-y-0.5 border-r border-black/[0.06] p-3">
-          {NAV.map(({ id, icon: Icon, label }) => (
-            <button
-              key={id}
-              onClick={() => setPage(id)}
-              className={cn(
-                'flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] text-black/60 transition-colors hover:bg-black/[0.04] hover:text-ink',
-                page === id && 'bg-black/[0.06] font-semibold text-ink hover:bg-black/[0.06]',
-              )}
-            >
-              <Icon className="size-3.5" /> {label}
-            </button>
-          ))}
-        </aside>
+    <Dialog open onOpenChange={(open) => { if (!open) onClose() }}>
+      <DialogContent
+        className="grid h-[640px] w-[920px] max-w-[94vw] sm:max-w-[94vw] grid-cols-[200px_1fr] grid-rows-[1fr] gap-0 overflow-hidden rounded-xl bg-white p-0 text-black shadow-2xl ring-black/[0.08]"
+      >
+        <Tabs orientation="vertical" value={page} onValueChange={setPage} className="contents">
+          {/* 左导航 */}
+          <TabsList
+            variant="line"
+            className="h-full! w-full items-start justify-start gap-0.5 border-r border-black/[0.06] bg-transparent p-3"
+          >
+            {NAV.map(({ id, icon: Icon, label }) => (
+              <TabsTrigger
+                key={id}
+                value={id}
+                className="flex h-8 w-full flex-none justify-start gap-2 rounded-lg px-2 py-1.5 text-[13px] text-black/60 hover:bg-black/[0.04] hover:text-ink data-active:bg-black/[0.06] data-active:shadow-none"
+              >
+                <Icon className="size-3.5" /> {label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-        {/* 内容 */}
-        <div className="flex min-h-0 flex-col">
-          <header className="flex items-center justify-between px-6 pt-5">
-            <div>
-              <h2 className="text-[15px] font-semibold tracking-tight">{stub ? stub[0] : 'Profile'}</h2>
-              <p className="mt-0.5 text-[13px] text-black/50">{stub ? stub[1] : 'How you appear to teammates.'}</p>
-            </div>
-            <button onClick={onClose} className="grid size-7 place-items-center rounded-lg text-black/50 hover:bg-black/[0.05] hover:text-ink">
-              <X className="size-4" />
-            </button>
-          </header>
+          {/* 内容 */}
+          <div className="flex min-h-0 min-w-0 flex-col">
+            <header className="flex items-center justify-between px-6 pt-5">
+              <div>
+                <h2 className="text-[15px] font-semibold tracking-tight">{stub ? stub[0] : 'Profile'}</h2>
+                <p className="mt-0.5 text-[13px] text-black/50">{stub ? stub[1] : 'How you appear to teammates.'}</p>
+              </div>
+            </header>
 
-          {page === 'profile' ? (
-            <div className="scroll-slim grid flex-1 gap-6 overflow-auto px-6 py-6">
+            <TabsContent value="profile" className="scroll-slim grid flex-1 gap-6 overflow-auto px-6 py-6">
               <Field label="Profile Photo" hint="Shown on boards and docs.">
                 <div className="flex items-center gap-2.5">
-                  <img src={form.avatar} alt="" className="size-10 rounded-full object-cover" />
+                  <Avatar className="size-10">
+                    <AvatarImage src={form.avatar} alt="" />
+                  </Avatar>
                   <button
                     onClick={() => fileRef.current?.click()}
                     className="flex items-center gap-1.5 rounded-lg border border-black/[0.12] px-2.5 py-1.5 text-xs font-medium hover:bg-black/[0.04]"
@@ -165,39 +159,41 @@ export default function ProfileDialog({ onClose, initialPage = 'profile' }) {
               </Field>
 
               <Field label="Bio" hint="Short profile summary.">
-                <textarea
+                <Textarea
                   value={form.bio}
                   onChange={(e) => set({ bio: e.target.value })}
                   rows={4}
-                  className="w-full resize-y rounded-lg border border-black/[0.1] bg-white px-3 py-2 text-[13px] leading-relaxed outline-none transition-shadow focus:ring-2 focus:ring-black/15"
+                  className="w-full resize-y border-black/[0.1] bg-white px-3 py-2 text-[13px] leading-relaxed focus:ring-black/15"
                 />
               </Field>
-            </div>
-          ) : (
-            <div className="grid flex-1 place-items-center px-6 py-16 text-[13px] text-black/40">
-              {stub[0]} settings go here.
-            </div>
-          )}
+            </TabsContent>
 
-          <footer className="flex items-center justify-end gap-2 border-t border-black/[0.06] px-6 py-3.5">
-            <button
-              onClick={() => { setForm(profile); onClose() }}
-              className="rounded-lg border border-black/[0.1] px-3.5 py-1.5 text-[13px] font-medium text-black/70 hover:bg-black/[0.04]"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={save}
-              className={cn(
-                'rounded-lg px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors',
-                saved ? 'bg-[#12b76a]' : 'bg-ink hover:bg-black/85',
-              )}
-            >
-              {saved ? '已保存' : 'Save changes'}
-            </button>
-          </footer>
-        </div>
-      </div>
-    </div>
+            {Object.entries(STUBS).map(([id, [title]]) => (
+              <TabsContent key={id} value={id} className="grid flex-1 place-items-center px-6 py-16 text-[13px] text-black/40">
+                {title} settings go here.
+              </TabsContent>
+            ))}
+
+            <footer className="flex items-center justify-end gap-2 border-t border-black/[0.06] px-6 py-3.5">
+              <button
+                onClick={() => { setForm(profile); onClose() }}
+                className="rounded-lg border border-black/[0.1] px-3.5 py-1.5 text-[13px] font-medium text-black/70 hover:bg-black/[0.04]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={save}
+                className={cn(
+                  'rounded-lg px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors',
+                  saved ? 'bg-[#12b76a]' : 'bg-ink hover:bg-black/85',
+                )}
+              >
+                {saved ? '已保存' : 'Save changes'}
+              </button>
+            </footer>
+          </div>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
   )
 }

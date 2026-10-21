@@ -1,7 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { UserRound, Building2, Users, CreditCard, SlidersHorizontal, LogOut, Sun, Moon, Monitor } from 'lucide-react'
 import { useProfile } from './profile.js'
 import ProfileDialog from './ProfileDialog.jsx'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 
 const MENU = [
@@ -23,16 +32,6 @@ export default function UserMenu() {
   const [open, setOpen] = useState(false)
   const [dialog, setDialog] = useState(null)
   const [theme, setTheme] = useState(() => localStorage.getItem('mesh-theme') || 'light')
-  const ref = useRef(null)
-
-  useEffect(() => {
-    if (!open) return
-    const onDown = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
-    }
-    window.addEventListener('mousedown', onDown)
-    return () => window.removeEventListener('mousedown', onDown)
-  }, [open])
 
   useEffect(() => {
     const root = document.documentElement
@@ -41,48 +40,46 @@ export default function UserMenu() {
     localStorage.setItem('mesh-theme', theme)
   }, [theme])
 
-  const itemCls =
-    'flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-[13px] text-black/75 transition-colors hover:bg-black/[0.05]'
-
   return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        title={profile.name}
-        className="block rounded-full transition-transform hover:scale-105"
-      >
-        <img src={profile.avatar} alt={profile.name} className="size-7 rounded-full object-cover" />
-      </button>
+    <>
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger
+          title={profile.name}
+          aria-label={profile.name}
+          className="block rounded-full transition-transform outline-none hover:scale-105 focus-visible:ring-2 focus-visible:ring-black/20"
+        >
+          <Avatar className="size-7">
+            <AvatarImage src={profile.avatar} alt={profile.name} />
+          </Avatar>
+        </DropdownMenuTrigger>
 
-      {open && (
-        <div className="absolute bottom-0 left-9 z-40 w-64 origin-bottom-left animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-3 rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-xl duration-200">
+        <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-64 rounded-xl p-1.5 shadow-xl">
           {/* 用户卡片 */}
           <div className="flex items-center gap-2.5 rounded-lg px-2 py-2">
-            <img src={profile.avatar} alt="" className="size-9 rounded-lg object-cover" />
+            <Avatar className="size-9 rounded-lg">
+              <AvatarImage src={profile.avatar} alt="" />
+            </Avatar>
             <div className="min-w-0">
               <div className="truncate text-[13px] font-semibold tracking-tight">{profile.name}</div>
               <div className="truncate text-xs text-black/45">{profile.email}</div>
             </div>
           </div>
 
-          <div className="my-1 h-px bg-black/[0.06]" />
+          <DropdownMenuSeparator className="my-1 bg-black/[0.06]" />
 
           {MENU.map(({ icon: Icon, label, shortcut, action }) => (
-            <button
+            <DropdownMenuItem
               key={label}
-              className={itemCls}
-              onClick={() => {
-                setOpen(false)
-                setDialog(action)
-              }}
+              className="gap-2.5 px-2 py-1.5 text-[13px] text-black/75"
+              onSelect={() => setDialog(action)}
             >
               <Icon className="size-3.5 text-black/50" />
               <span className="flex-1">{label}</span>
-              {shortcut && <span className="text-[11px] text-black/35">{shortcut}</span>}
-            </button>
+              {shortcut && <DropdownMenuShortcut className="text-[11px] text-black/35">{shortcut}</DropdownMenuShortcut>}
+            </DropdownMenuItem>
           ))}
 
-          <div className="my-1 h-px bg-black/[0.06]" />
+          <DropdownMenuSeparator className="my-1 bg-black/[0.06]" />
 
           {/* 主题切换 */}
           <div className="flex items-center gap-2.5 rounded-lg px-2 py-1.5">
@@ -106,15 +103,15 @@ export default function UserMenu() {
             </span>
           </div>
 
-          <div className="my-1 h-px bg-black/[0.06]" />
+          <DropdownMenuSeparator className="my-1 bg-black/[0.06]" />
 
-          <button className={itemCls} onClick={() => setOpen(false)}>
+          <DropdownMenuItem className="gap-2.5 px-2 py-1.5 text-[13px] text-black/75" onSelect={() => setOpen(false)}>
             <LogOut className="size-3.5 text-black/50" /> Sign Out
-          </button>
-        </div>
-      )}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {dialog && <ProfileDialog initialPage={dialog} onClose={() => setDialog(null)} />}
-    </div>
+    </>
   )
 }

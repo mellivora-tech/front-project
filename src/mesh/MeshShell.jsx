@@ -7,7 +7,7 @@ export default function MeshShell({ active, children }) {
     <div className="h-screen bg-gradient-to-br from-[#e9edf6] via-[#f6f4f1] to-[#faeee3] text-ink">
       <div className="flex h-full">
         <Rail active={active} />
-        <div className="m-2 flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl bg-[#f5f5f6] shadow-xl">
+        <div className="m-2 flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl bg-white shadow-xl">
           {children}
         </div>
       </div>

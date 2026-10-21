@@ -22,6 +22,7 @@ import {
   ListChecks,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 /* ── 基础元件 ─────────────────────────────── */
 
@@ -283,15 +284,15 @@ export default function MeshHome() {
       <header className="flex h-13 items-center justify-between border-b border-black/[0.07] bg-white px-4 py-2.5">
           <h1 className="text-[15px] font-semibold tracking-tight">Home</h1>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 rounded-lg border border-black/[0.08] px-3 py-1.5 text-[13px] font-medium hover:bg-black/[0.04]">
+            <Button variant="outline" size="sm" className="gap-1.5 border-black/[0.08] bg-white px-3 text-[13px] font-medium hover:bg-black/[0.04]">
               <Sparkles className="size-3.5" /> Ask AI
-            </button>
-            <button className="flex items-center gap-1.5 rounded-lg border border-black/[0.08] px-3 py-1.5 text-[13px] font-medium hover:bg-black/[0.04]">
+            </Button>
+            <Button variant="outline" size="sm" className="gap-1.5 border-black/[0.08] bg-white px-3 text-[13px] font-medium hover:bg-black/[0.04]">
               <Share2 className="size-3.5" /> Share
-            </button>
-            <button className="flex items-center gap-1.5 rounded-lg bg-ink px-3.5 py-1.5 text-[13px] font-medium text-white hover:bg-black/85">
+            </Button>
+            <Button size="sm" className="gap-1.5 bg-ink px-3.5 text-[13px] font-medium text-white hover:bg-black/85">
               <Download className="size-3.5" /> Export
-            </button>
+            </Button>
           </div>
         </header>
 
